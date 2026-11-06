@@ -78,9 +78,19 @@ test('every ponytail-debt copy greps #, // and /* markers but not prose', (t) =>
   }
 });
 
+test('the ponytail-debt scan selects color=never for non-color environments', () => {
+  const documented = fs.readFileSync(path.join(root, 'skills/ponytail-debt/SKILL.md'), 'utf8').match(/`([^`]*git grep [^`]+)`/)[1];
+  assert.match(documented, /color=auto/);
+  assert.match(documented, /NO_COLOR/);
+  assert.match(documented, /FORCE_COLOR/);
+  assert.match(documented, /TERM/);
+  assert.match(documented, /! -t 1/);
+  assert.match(documented, /color=never/);
+  assert.match(documented, /--color=\"\$color\"/);
+});
 // The full documented command must skip .git and whatever .gitignore ignores, in any stack (#948, #1100).
 test('the ponytail-debt scan skips .git and ignored dirs like node_modules, dist, build and .next', (t) => {
-  const cmd = fs.readFileSync(path.join(root, 'skills/ponytail-debt/SKILL.md'), 'utf8').match(/`(git grep [^`]+)`/)[1];
+  const cmd = fs.readFileSync(path.join(root, 'skills/ponytail-debt/SKILL.md'), 'utf8').match(/`([^`]*git grep [^`]+)`/)[1];
   const dir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'ponytail-debt-'));
   for (const sub of ['src', '.git', 'node_modules/pkg', 'dist', 'build', '.next']) {
     fs.mkdirSync(path.join(dir, sub), { recursive: true });
